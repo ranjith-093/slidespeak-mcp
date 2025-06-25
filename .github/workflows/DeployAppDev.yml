@@ -28,8 +28,8 @@ jobs:
         run: gcloud auth configure-docker $REGION-docker.pkg.dev
       - name: Build and push Docker image
         run: |
-          docker build --build-arg ENV=$ENV -t $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH .
-          docker push $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH
+          docker build --build-arg ENV=$ENV -t $REGION-docker.pkg.dev/$PROJECT_ID/mcp-server/$IMAGE_NAME:$COMMIT_HASH .
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/mcp-server/$IMAGE_NAME:$COMMIT_HASH
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $SERVICE_NAME \
