@@ -1,0 +1,40 @@
+name: Deploy Main Backend to Cloud Run
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      REGION: ${{ secrets.GCP_REGION }}
+      REPO: ${{ github.event.repository.name }}
+      IMAGE_NAME: ${{ github.event.repository.name }}
+      SERVICE_NAME: ${{ github.event.repository.name }}-${{ github.ref_name }}
+      COMMIT_HASH: ${{ github.sha }}
+      ENV: ${{ github.ref_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Configure Docker
+        run: gcloud auth configure-docker $REGION-docker.pkg.dev
+      - name: Build and push Docker image
+        run: |
+          docker build --build-arg ENV=$ENV -t $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH .
+          docker push $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 3000 \

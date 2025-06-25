@@ -12,4 +12,6 @@ RUN uv sync --frozen
 
 COPY slidespeak.py slidespeak.py
 
+EXPOSE 3000
+
 CMD ["uv", "run", "slidespeak.py"]
