@@ -33,7 +33,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy $SERVICE_NAME \
-            --image $REGION-docker.pkg.dev/$PROJECT_ID/ruh/$IMAGE_NAME:$COMMIT_HASH \
+            --image $REGION-docker.pkg.dev/$PROJECT_ID/mcp-server/$IMAGE_NAME:$COMMIT_HASH \
             --region $REGION \
             --platform managed \
             --allow-unauthenticated \
